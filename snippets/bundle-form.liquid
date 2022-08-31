@@ -1,0 +1,45 @@
+<div class="bundle-area">
+{% for option in product.metafields.bundle.options.value %}
+<div class="bundle-option">
+ {%- assign assign file_extension = 'png' -%}
+<div class="swatch-wrapper " data-option="option{{ option.position }}">
+  <div class="flex align-center spaced">
+  <div class="option-name flex align-center">
+    <label class="swatch-label mr1" for="SingleOptionSelector-{{ index }}-{{ section.id }}">
+		{{- option.title -}}
+	</label>
+  <label class="variant-label variant-label--color" for="SingleOptionSelector-{{ index }}-{{ product_id }}">
+    <span class="visually-hidden">{{ option.name }}</span>
+    <span class="variant-label__value" data-color-label> Please Select</span>
+  </label>
+    </div>
+ 
+  </div>
+    <div class="swatch" data-option-index="{{ forloop.index }}">
+  	{% for value in option.options %}
+        {%- assign swatch_color = value | split: ' ' | last | handle -%}
+        <div data-value="{{ value | escape }}" class="swatch__element">
+          <input
+            id="option{{ option.position }}-{{ value | handle }}-{{ index }}-{{ unique }}"
+            class="swatch__input swatch-element"
+            type="radio"
+           name="properties[{{ option.title }}]"
+            value="{{ value | escape }}"
+           data-value="{{ value | escape }}"
+            data-color-swatch
+            
+            data-index="option{{ option.position }}" 
+            >
+          <label class="swatch__label" for="option{{ option.position }}-{{ value | handle }}-{{ index }}-{{ unique }}">
+            <span class="swatch__color swatch__color--{{ value | handle }}" style="color: {{ swatch_color }}; background-color: {{ swatch_color }}; background-image: url({{ value | handle | append: '.' | append: file_extension | asset_url }})"></span>
+            <span class="visually-hidden">{{ value }}</span>
+          </label>
+        </div>
+      {%- endfor -%}
+    </div>
+  
+  </div>
+ 
+</div>
+{% endfor %}
+</div>

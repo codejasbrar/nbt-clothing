@@ -1,0 +1,24 @@
+{% if product.metafields.description.icons.value != blank %}
+
+<div class="product-features">
+
+  {% comment %}
+    
+    <h3 class="h4">{{ 'products.product.icon_header' | t }}</h3>
+
+  {% endcomment %}
+
+  <h3 class="h4">{{ product.metafields.custom.product_icon_section }}</h3>
+
+<div class="flex icon-list text-center">
+ 
+    {% for icon in product.metafields.description.icons.value %}
+   <div class="block-icon">
+    {% render 'bd-icons', icon: icon.icon %}
+     <div class="name">{{ icon.name }}</div>
+     </div>
+    {% endfor %}
+  
+</div>
+
+</div>{% endif %}  

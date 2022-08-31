@@ -1,0 +1,50 @@
+<section class="policy-info spt spb">
+<div class="wrapper">
+  {% case section.settings.policy %}
+    {%  when 'returns' %}
+    {{   shop.refund_policy.body }}
+     {%  when 'privacy' %}
+       {{   shop.privacy_policy.body }}
+     {%  when 'shipping' %}
+       {{  shop.shipping_policy.body}}
+     {%  when 'terms' %}
+       {{ shop.terms_of_service.body }}
+    {% endcase %}
+</div>
+</section>
+{% schema %}
+  {
+    "name": "Policy Info",
+    "settings": [
+      {
+        "type":"select",
+        "id":"policy",
+        "label":"Select Policy",
+        "options": [
+    {
+      "value": "returns",
+      "label": "Returns"
+    },
+    {
+      "value": "privacy",
+      "label": "Privacy"
+    },
+    {
+      "value": "shipping",
+      "label": "Shipping"
+    },
+             {
+      "value": "terms",
+      "label": "Terms"
+    }
+  ]
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

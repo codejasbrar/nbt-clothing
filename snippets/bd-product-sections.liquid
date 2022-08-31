@@ -1,0 +1,79 @@
+{% capture images %}{% for image in product.metafields.section_image %}{{ image.last.value | replace: 'files/' | strip | strip_newlines }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
+{%- assign imagesArray = images | split: ',' -%}
+ 
+{% capture videos %}{% for video in product.metafields.section_video %}{{ video.last.value | replace: 'files/' | strip | strip_newlines }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
+{%- assign videosArray = videos | split: ',' -%}
+ 
+{% capture ctas %}{% for cta in product.metafields.section_cta %}{{ cta.last.value }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
+{%- assign ctasArray = ctas | split: ',' -%}
+
+{% for info in product.metafields.section_info %}
+ 
+{% capture videoNum %}video{{ forloop.index }}{% endcapture %}
+
+
+<section class="section-pad product-section">
+  <div class="wrapper">
+    
+    <div class="product-feature__block  flex">
+      <div class="product-feature__images">
+     
+      {% if product.metafields.section_video[videoNum] != blank %}
+        
+ <video class="lazyload"  data-poster="{{ imagesArray[forloop.index0] | file_img_url: '1080x' }}"  autoplay loop muted  playsinline src="{{  product.metafields.section_video[videoNum] | file_url }}" id="placeholderVideo"></video>
+
+        
+       {% else %}
+        
+         {%- assign img_url = imagesArray[forloop.index0]  |  file_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%} 
+         <img class="lazyload one-whole"
+                data-src="{{ img_url }}"
+                data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]" 
+          data-sizes="auto"
+           alt="">
+          {% endif %}
+        
+      </div>
+    
+      <div class="product-feature__text product-feature__text--left rte">
+        
+      {{ info.last }}
+        {% capture formId %}sectionForm{{forloop.index }}{% endcapture %}
+        {%- form 'product', product, class: "product-form", data-product-form: '', id: formId, data-enable-button: false -%}
+        
+        <div class="hider">
+            {%- if product.variants.size > 1 -%}
+      <label for="productSelect--{{ unique }}" class="visually-hidden">{{ 'general.accessibility.select_variant' | t }}</label>
+      <select
+        name="id"
+        id="sectionSelect--{{ formId }}"
+        class="sections-single-select hide"
+        data-productid="{{ product.id }}"
+        data-product-select>
+        {%- for variant in product.variants -%}
+          {%- if variant.available -%}
+            <option
+              {% if variant == current_variant %} selected="selected" {% endif %}
+              data-sku="{{ variant.sku }}"
+              value="{{ variant.id }}">{{ variant.title | strip_html | escape }} - {{ variant.price | money_with_currency }}</option>
+          {%- else -%}
+            <option disabled="disabled">{{ variant.title | strip_html | escape }} - {{ 'products.product.sold_out' | t }}</option>
+          {%- endif -%}
+        {%- endfor -%}
+      </select>
+    {%- else -%}
+      <input name="id" data-productid="{{ product.id }}" type="hidden" value="{{ current_variant.id }}" data-product-select>
+    {%- endif -%}
+        </div>
+        
+        
+        <button class="btn">{{ ctasArray[forloop.index0] }}</button>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endfor %}
+
+

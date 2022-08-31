@@ -1,0 +1,153 @@
+<style>
+  /* Styles for collection hero - found in dp-collection-hero-styles.liquid */
+.dp-hero-wrap {
+  max-width: 1280px;
+  margin: 4em auto;
+}
+  .collection__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .subcollections-section {
+    padding-top: 0px !important;
+  }
+  .dp-hero-inner {
+    display: flex;
+  }
+  .dp-hero-right {
+    position: relative;
+  }
+  .dp-hero-left {
+    padding: 56px 48px;
+    position: relative;
+    z-index: 3;
+    color: white;
+  }
+  .dp-hero-gradient {
+    background: black;
+/*     background: #898A74; */
+    position: relative;
+  }
+  .dp-hero-gradient::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background: #b49581;
+    background: linear-gradient(to right, black 0%, black 50%, rgba(0,0,0,0) 60%);
+/*     background: linear-gradient(to right, #3d4035 0%, black 50%, rgba(0,0,0,0) 60%); */
+    display: block;
+    top: 0;
+    left: 0;
+    position: absolute;
+    bottom: 0;
+    z-index: 2;
+  }
+  .dp-hero-title {
+   	color: #e1e1e1; 
+  }
+  .dp-hero-picture {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    right: 0;
+  }
+  .dp-hero-picture img {
+    height: 100%;
+    object-fit: cover;
+    float: right;
+  }
+  .dp-hero-left {
+    width: 50%;
+  }
+  .dp-hero-right {
+    width: 50%;
+  }
+  .dp-hero-read-more {
+    display: none;
+    color: #e1e1e1;
+    cursor: pointer;
+  }
+  @media (max-width: 900px) {
+    .dp-hero-left-inner {
+      max-height: 120px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      transition: max-height 1s ease-in-out;
+    }
+    .dp-hero-left-inner.expanded {
+      max-height: 1200px;
+    }
+    .dp-hero-read-more {
+      display: block;
+    }
+    .dp-hero-left {
+      width: 100%;
+      padding-top: 20px;
+      padding-bottom: 40px;
+    }
+    .dp-hero-right {
+      width: 100%;
+    }
+    .dp-hero-inner {
+      flex-direction: column-reverse;
+      text-align: center;
+    }
+    .dp-hero-picture {
+      position: relative;
+      width: 100%;
+    }
+    .dp-hero-picture img {
+      float: none;
+      width: 100%;
+      max-height: 256px
+    }
+    .dp-hero-gradient::before {
+      display: none; 
+    }
+  }
+</style>
+
+{% if collection.metafields.global.hero_title != blank %}
+<div class="dp-hero-wrap">
+  <div class="dp-hero-gradient dp-hero-inner">
+    <div class="dp-hero-left">
+      <h1 class="dp-hero-title">
+        {{ collection.metafields.global.hero_title }}
+      </h1>
+      <div class="dp-hero-left-inner">
+        {{ collection.metafields.global.hero_description }}
+      </div>
+      <a class="dp-hero-read-more">Read more</a>
+    </div>
+    
+    <div class="dp-hero-right">
+      <picture class="dp-hero-picture">
+        <img class="lazyload fade-in"
+             src="{{ collection.metafields.global.hero_img | img_url: '20x' }}"
+             data-src="{{ collection.metafields.global.hero_img | img_url: '650x' }}"
+             data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+             data-aspectratio="{{ product.featured_image.aspect_ratio }}"
+             data-sizes="auto"
+             data-parent-fit="contain"
+             alt="{{ collection.metafields.global.hero_title }}"
+             width="650" height="250">
+      </picture>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  window.addEventListener('load', function(event) {
+    $(".dp-hero-read-more").on("click", function() {
+      var dpBtn = $(this);
+      var dpTextBox = dpBtn.prev(".dp-hero-left-inner");
+      if (dpBtn.text() == "Read more") {
+        dpBtn.text("Read less")
+      } else {
+        dpBtn.text("Read more")
+      }
+      dpTextBox.toggleClass("expanded")
+    })
+  });
+</script>

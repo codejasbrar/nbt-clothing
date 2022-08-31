@@ -1,0 +1,160 @@
+<section class="section-pad">
+  <div class="flex align-center">
+  {% for block in section.blocks %}
+    <div class="fifty mobile-order-{{ block.settings.mobile_block_order }}">
+      
+      
+      {% if block.settings.image != blank %}
+      <div class="block-image  {{ section.settings.section_height }}">
+    {% assign img_url =  block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+   												<img class="lazyload" 
+                                                 alt="" 
+                                                 data-src="{{ img_url }}" 
+                                                 data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]" 
+                                                 data-aspectratio="auto" 
+                                                 data-sizes="auto">
+         </div>
+        {% endif %}
+        
+        
+        
+        {% if block.settings.title != blank or block.settings.content  != blank %}
+        <div class="block-copy image-column__text">
+          <h2 class="block-title">{{ block.settings.title }}</h2>
+          <div class="block-content">{{ block.settings.content }}</div>
+          
+            {%- if block.settings.button_text != blank -%}
+          <div class="mt1">
+              <a class="btn btn--{{ block.settings.button_style }}" href="{{ block.settings.button_url }}">{{ block.settings.button_text }}</a>
+          </div>
+            {%- endif -%}
+        </div>
+        {% endif %}
+     
+      
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "BD Text Blocks",
+    "settings": [
+      {
+      "type": "select",
+      "id": "section_height",
+      "label": "Section height",
+      "default": "sixty-fifty-height-hero",
+      "options": [
+        {
+            "value": "one-hundred-height-hero",
+            "label": "Full screen"
+          },
+          {
+            "value": "seven-fifty-height-hero",
+            "label": "750px"
+          },
+          {
+            "value": "sixty-fifty-height-hero",
+            "label": "650px"
+          },
+          {
+            "value": "five-fifty-height-hero ",
+            "label": "550px"
+          },
+          {
+            "value": "four-fifty-height-hero",
+            "label": "450px"
+          }
+        ]
+      }
+],
+"blocks": [
+      {
+        "name": "Block",
+        "type": "block",
+        "settings": [
+{
+"type":"header",
+"content":"Content"
+},
+     {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      },
+    {
+        "type": "text",
+        "id": "content",
+        "label": "Content"
+      },
+{
+"type":"header",
+"content":"Image"
+},
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "image_picker",
+            "id": "m_image",
+            "label": "Mobile Image"
+          },
+{
+"type":"header",
+"content":"CTA"
+},
+    {
+        "type": "text",
+        "id": "button_text",
+        "label": "Button text",
+        "default": "Shop now"
+      },
+      {
+        "type": "url",
+        "id": "button_url",
+        "label": "Button link"
+      },
+      {
+        "type": "select",
+        "id": "button_style",
+        "label": "Button style",
+        "default": "primary",
+        "options": [
+          { "label": "Primary", "value": "primary" },
+          { "label": "Secondary", "value": "secondary" }
+        ]
+      },
+{
+"type":"header",
+"content":"Mobile Settings"
+},
+{
+    "type":      "range",
+    "id":        "mobile_block_order",
+    "min":       0,
+    "max":        10,
+    "step":       1,
+    "label":     "Mobile Block Order",
+    "default":   0
+}
+]
+}
+],
+    "presets": [
+      {
+        "name": "BD Text Blocks",
+        "category": "BD Custom"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

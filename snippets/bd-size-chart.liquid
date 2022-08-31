@@ -1,0 +1,94 @@
+{% if   product.metafields.size.chart.value %}
+
+{% assign page = product.metafields.size.chart.value %}
+
+<a href="#" class="text-btn underlined size-chart-btn" aria-controls="sizeChart" data-popup-trigger="size-chart">
+        Size Chart
+    </a>
+    <div class="size-chart" id="sizeChart" data-popup="size-chart">
+        <table class="responsive-table" data-collapsible-content>
+            {% if page.metafields.sizing.chart_description != blank %}
+                <div class="chart-discription">
+                    {{ page.metafields.sizing.chart_description }}</div>
+            {% endif %}
+            {% for item in page.metafields.sizing.chart.value %}
+                {% if forloop.first %}
+                    <thead>
+                        {% for size in item %}
+                            <td>{{ size.first }}</td>
+                        {% endfor %}
+                    </thead>
+                    {% break %}
+                {% endif %}
+            {% endfor %}
+            {% for item in page.metafields.sizing.chart.value %}
+                <tr>
+                    {% for size in item %}
+                        <td data-label="{{ size.first }}">{{ size.last }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="chart-disclaimer">{{ settings.size_chart_disclaimer }}</div>
+        {% if page.metafields.sizing.chart_image != blank %}
+            <div class="bdgrid flex align-center grid--margin-bottom">
+                <div class="bdgrid__item medium-up--three-fifths flex-grow">
+                    {% assign img_url =  page.metafields.sizing.chart_image.value | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                    <div class="chart-image">
+                        <img class="lazyload" alt="" data-src="{{ img_url }}" data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]" data-aspectratio="{{ page.metafields.sizing.chart_image.value.aspect_ratio }}" data-sizes="auto" data-parent-fit="cover" width="{{ page.metafields.sizing.chart_image.value.width }}" height="{{ page.metafields.sizing.chart_image.value.width | divided_by: page.metafields.sizing.chart_image.value.aspect_ratio }}"></div>
+                    </div>
+                    {% if page.metafields.sizing.image_description != blank %}
+                        <div class="bdgrid__item medium-up--two-fifths">
+                            {{ page.metafields.sizing.image_description }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+
+{% elsif product.metafields.sizing.chart != blank %}
+    <a href="#" class="text-btn underlined size-chart-btn" aria-controls="sizeChart" data-popup-trigger="size-chart">
+        Size Chart
+    </a>
+    <div class="size-chart" id="sizeChart" data-popup="size-chart">
+        <table class="responsive-table" data-collapsible-content>
+            {% if product.metafields.sizing.chart_description != blank %}
+                <div class="chart-discription">
+                    {{ product.metafields.sizing.chart_description }}</div>
+            {% endif %}
+            {% for item in product.metafields.sizing.chart.value %}
+                {% if forloop.first %}
+                    <thead>
+                        {% for size in item %}
+                            <td>{{ size.first }}</td>
+                        {% endfor %}
+                    </thead>
+                    {% break %}
+                {% endif %}
+            {% endfor %}
+            {% for item in product.metafields.sizing.chart.value %}
+                <tr>
+                    {% for size in item %}
+                        <td data-label="{{ size.first }}">{{ size.last }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="chart-disclaimer">{{ settings.size_chart_disclaimer }}</div>
+        {% if product.metafields.sizing.chart_image != blank %}
+            <div class="bdgrid flex align-center grid--margin-bottom">
+                <div class="bdgrid__item medium-up--three-fifths flex-grow">
+                    {% assign img_url =  product.metafields.sizing.chart_image.value | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                    <div class="chart-image">
+                        <img class="lazyload" alt="" data-src="{{ img_url }}" data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]" data-aspectratio="{{ product.metafields.sizing.chart_image.value.aspect_ratio }}" data-sizes="auto" data-parent-fit="cover" width="{{ product.metafields.sizing.chart_image.value.width }}" height="{{ product.metafields.sizing.chart_image.value.width | divided_by: product.metafields.sizing.chart_image.value.aspect_ratio }}"></div>
+                    </div>
+                    {% if product.metafields.sizing.image_description != blank %}
+                        <div class="bdgrid__item medium-up--two-fifths">
+                            {{ product.metafields.sizing.image_description }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}

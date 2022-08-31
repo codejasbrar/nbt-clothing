@@ -1,0 +1,658 @@
+<!-- /snippets/product.liquid -->
+
+{%- comment -%}
+    Renders product content
+
+    Accepts: 
+    - product: {Object} Current product (required)
+    - section: {Object} Image to render (required)
+    - unique: {Object} Section id (required)
+
+    Usage:
+    {%- render 'product' product: product, section: section, unique: unique -%}
+{%- endcomment -%}
+{%- liquid
+  assign image_gallery = section.settings.image_gallery
+  assign hide_product_thumbnails = section.settings.hide_product_thumbnails | default: false
+  assign enable_color_swatches = settings.enable_color_swatches
+  assign enable_variant_boxes = settings.enable_variant_boxes
+  assign show_payment_button = settings.show_payment_button
+  assign file_extension = 'png'
+  assign enable_video_looping = section.settings.enable_video_looping | default: settings.enable_video_looping
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media
+  assign featured_media_id = featured_media.id
+  assign first_3d_model = product.media | where: 'media_type', 'model' | first
+  assign sold_out = true
+  if current_variant.available
+    assign sold_out = false
+  endif
+
+  if product != blank
+    assign product_title = product.title | strip_html | escape
+    assign product_url = product.url
+  else
+    assign product_title = 'homepage.onboarding.product_title' | t
+    assign product_url = '#'
+  endif
+
+  if product.media.size < 2 and section_type == 'featured'
+    assign hide_product_thumbnails = true
+  endif
+-%}
+
+<div class="product-single__wrapper" data-section-id="{{ unique }}" data-product>
+  {%- comment -%} Product media {%- endcomment -%}
+  {%- unless product == blank -%}
+    <div class="product-single__gallery cstm_mob"
+      id="ProductPhoto--{{ unique }}"
+      data-gallery="{{ image_gallery }}"
+      data-product-single-media-group>
+      <div class="product-single__media-slider{% if product.media.size == 1 %} product-single__media-slider--single{% endif %}" data-product-single-media-slider>
+        {%- if product.media.size > 0 -%}
+          {%- comment -%} Show Featured media first {%- endcomment -%}
+          {%- render 'media', unique: unique, current_variant: current_variant, media: featured_media, featured_media: featured_media, enable_video_looping: enable_video_looping, image_gallery: image_gallery, product_tags: product.tags -%}
+
+          {%- comment -%} Loop product media skipping the featured {%- endcomment -%}
+          {%- for media in product.media -%}
+            {%- if media.id != featured_media_id -%}
+              {%- render 'media', unique: unique, current_variant: current_variant, media: media, featured_media: featured_media, enable_video_looping: enable_video_looping, image_gallery: image_gallery, product_tags: product.tags -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- assign media_aspect_ratio = 1 -%}
+          {%- assign media_padding_top = 1 | divided_by: media_aspect_ratio | times: 100 | round: 1 -%}
+          {%- assign image_url_pattern = product.featured_image | img_url: '1000x' | replace: '_1000x.', '_{width}x.' -%}
+          {%- assign image_widths = "[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048, 2450, 2700, 3000, 3350, 3750, 4100]" -%}
+          <div
+            id="FeaturedMedia-{{ unique }}"
+            class="product-single__media-slide{% unless featured_media == media %} media--hidden{% endunless %}"
+            data-id="{{ unique }}"
+            data-media-id="{{ unique }}"
+            data-aspectratio="{{ media_aspect_ratio }}"
+            data-product-single-media-wrapper>
+            <div class="product-single__media product-single__media--image">
+              <div class="product-single__media--image-height" style="padding-top: {{ media_padding_top }}%;"></div>
+              <img class="lazyload"
+                src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                data-src="{{ image_url_pattern }}"
+                data-widths= "{{ image_widths }}"
+                data-aspectratio="{{ media_aspect_ratio }}"
+                data-sizes="auto"
+                data-object-fit="contain"
+                alt="{{ product.title | strip_html | escape }}">
+              <noscript>
+                <img src="{{ media | img_url: '1024x' }}" alt="{{ product.title | strip_html | escape }}">
+              </noscript>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if first_3d_model -%}
+        <button
+          aria-label="{{ 'products.product.view_in_space_label' | t }}"
+          class="btn btn--ar product-single__view-in-space"
+          data-shopify-xr
+          data-shopify-model3d-id="{{ first_3d_model.id }}"
+          data-shopify-title="{{ product.title | strip_html | escape }}"
+          data-shopify-xr-hidden>
+
+          {%- render 'icon-media-model' -%}
+          <span class='product-single__view-in-space-text'>{{ 'products.product.view_in_space' | t }}</span>
+        </button>
+      {%- endif -%}
+
+      {%- unless section_type == 'quickview' -%}
+        {%- comment -%} Product Thumbnails {%- endcomment -%}
+        {%- if product.media.size > 1 and hide_product_thumbnails == false -%}
+          <div class="product-single__thumbnails" id="ProductThumbs" data-product-single-media-thumbs>
+            {%- comment -%} Show Featured media thumbnail first {%- endcomment -%}
+            {%- render 'media-thumb', media: featured_media, featured_media: featured_media, product_title: product.title -%}
+
+            {%- comment -%} Loop product media skipping the featured media thumbnail {%- endcomment -%}
+            {%- for media in product.media -%}
+              {%- if media.id != featured_media_id -%}
+                {%- render 'media-thumb', media: media, featured_media: featured_media, product_title: product.title -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- endunless -%}
+    </div>
+  {%- assign selected_var = product.selected_or_first_available_variant.option1 | replace:'"','' -%}
+  <div class="cstm_des cstm_prd_des_images_gallery">
+    <div class="cstm_prd_des_images_gallery_inner">
+      <div class="cstm_prd_des_images_gallery_flex">
+        {%- for media in product.media -%}
+          <div class="cstm_prd_des_images_gallery_flex_item" data-option-value="{{ media.alt }}" {% if selected_var contains  media.alt %} style="display:block;" {% else %} style="display:none;" {% endif %}>
+			<img class="lazyload" loading="lazy" data-src="{{ media | img_url: '900x' }}" data-srcset="{{ media | img_url: '900x' }}" alt="Product Image" />
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  
+  {%- else -%}
+    {%- comment -%} Onboarding product media {%- endcomment -%}
+    <div class="featured-product__gallery" id="ProductPhoto--{{ unique }}">
+      <div class="featured-product__gallery__slider product-single__media-slider" >
+        <div class="product-single__media-slide">
+          <div class="product-single__media product-single__media--onboarding">
+            {{- 'product-5' | placeholder_svg_tag: 'placeholder-svg' -}}
+          </div>
+        </div>
+      </div>
+    </div>
+  {%- endunless -%}
+
+  {%- comment -%} Product Description {%- endcomment -%}
+  
+  
+  
+  
+  <div class="product-single__details">
+    {%- unless section_type == 'quickview' -%}
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            {%- capture app_code -%}
+              {%- render block -%}
+            {%- endcapture -%}
+
+            {%- comment -%} Display app in tabs if it contains reviews {%- endcomment -%}
+            {%- if app_code contains '<div id="shopify-product-reviews" data-id=' -%}
+              <div class="product-tabs">
+                <div class="product-tab" id="ProductTab--reviews-container">
+                  <button class="product-tab__title" aria-controls="ProductTab--{{ section.id }}-{{ block.id }}" data-collapsible-trigger>
+                    {{- 'products.general.reviews' | t -}}
+                    {%- render 'icon-plus' -%}
+                    {%- render 'icon-minus' -%}
+                  </button>
+                  <div class="product-tab__content" id="ProductTab--{{ section.id }}-{{ block.id }}" data-collapsible-container>
+                    <div class="product-tab__inner" data-collapsible-content>
+                      <div  class="product__reviews">
+                        {{ app_code }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- else -%}
+              {{ app_code }}
+            {%- endif -%}
+
+          {%- when 'title' -%}
+            <div class="product__title-and-price" {{ block.shopify_attributes }}>
+              {%- case block.settings.subheading -%}
+                {%- when 'breadcrumbs' -%}
+                  {%- render 'breadcrumbs' -%}
+
+                {%- when 'collection' -%}
+                  {%- if collection or product.collections.size > 0 -%}
+                    {%- assign collection = collection | default: product.collections[0] -%}
+              
+                    <nav class="breadcrumbs">
+                      <a href="{{ collection.url }}" title="{{ collection.title | strip_html | escape }}">{{ collection.title }}</a>
+                    </nav>
+                  {%- endif -%}
+
+                {%- when 'vendor' -%}
+                  {%- unless product == blank -%}
+                    {%- assign vendor = product.vendor -%}
+                  {%- else -%}
+                    {%- assign vendor = 'homepage.onboarding.vendor' | t -%}
+                  {%- endunless -%}
+
+                  <nav class="breadcrumbs">
+                    <span class="subheading-text">{{ vendor }}</span>
+                  </nav>
+              {%- endcase -%}
+
+              
+                {% render 'bd-badge-tags', product: product %}   
+              
+              	<div class="title-price-area">
+              <h1 class="product__title">
+                {%- if template == 'product' and section_type != 'featured' -%}
+                  {% assign productTitle =  product.title | split: '|' %}
+                
+                <span class="main-title">{{ productTitle.first }}</span>
+            {% if productTitle.size > 1 %}    <span class="sub-title">{{ productTitle.last }}</span> {% endif %}
+                
+               
+                {%- else -%}
+                  <a href="{{ product_url }}" title="{{ product_title }}">{{ product_title }}</a>
+                {%- endif -%}
+              </h1>
+                  
+                    
+              </div>
+              <div class="product__price-and-badge">
+                
+                
+                <div class="product__price" data-price-wrapper>
+                  {%- unless product == blank -%}
+                    <span data-product-price>{{ current_variant.price | money }} </span>
+                  {%- else -%}
+                    <span id="ProductPrice">{{ 1999 | money }}</span>
+                  {%- endunless -%}
+
+                  <s class="product__price__sale" data-compare-price>
+                    {%- if current_variant.compare_at_price -%}
+                      {{- current_variant.compare_at_price | money -}}
+                    {%- endif -%}
+                  </s>
+
+                  {%- if current_variant.unit_price_measurement -%}
+                    {%- capture unit_price_separator -%}
+                      <span aria-hidden="true">/</span><span class="visually-hidden">{{ 'general.accessibility.unit_price_separator' | t }}&nbsp;</span>
+                    {%- endcapture -%}
+
+                    <span class="product__unit-price" data-unit-wrapper>
+                      <span data-unit-price>
+                        {{ current_variant.unit_price | money }}
+                        {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                          {{- current_variant.unit_price_measurement.reference_value -}}
+                        {%- endif -%}
+                      </span>
+                      {{ unit_price_separator }}
+                      <span data-unit-base>{{ current_variant.unit_price_measurement.reference_unit }}</span>
+                    </span>
+                  {%- endif -%}
+                  </div>
+                {%- if block.settings.show_rating or settings.show_rating and section_type == 'quickview' -%}
+                  {%- unless product == blank -%}
+                              <a href="#reviewBlock"> {% render 'rating', reviews: product.metafields.reviews, show_rating_count: block.settings.show_rating_count, onboarding: false %}</a>
+                  {%- else -%}
+                    {%- render 'rating', show_rating_count: block.settings.show_rating_count, single_star: false, onboarding: true -%}
+                  {%- endunless -%}
+                {%- endif -%}
+
+
+              </div>
+            </div>
+
+          {%- when 'form' -%}
+            {%- unless product == blank -%}
+              <div class="product__form__wrapper" data-product-form-wrapper {{ block.shopify_attributes }}>
+                {%- comment -%} Product Form Snippet {%- endcomment -%}
+                {%- render 'new-pdp-form', product: product, current_variant: current_variant, show_payment_button: block.settings.show_payment_button, unique: unique -%}
+
+                {%- if settings.show_newsletter -%}
+                  {%- render 'notification-form', sold_out: sold_out, product_title: product.title, product_id: product.id -%}
+                {%- endif -%}
+              </div>
+            {%- else -%}
+              {%- render 'product-form-onboarding', show_payment_button: block.settings.show_payment_button -%}
+            {%- endunless -%}
+
+          {%- when 'pickup-availability' -%}
+            {%- comment -%} Surface pickup availability {%- endcomment -%}
+            <div class="product-single__store-availability-container" data-store-availability-container {{ block.shopify_attributes }}></div>
+
+          {%- when 'description' -%}
+            {%- comment -%} Product Description and product tabs {%- endcomment -%}
+
+          {%- when 'social-sharing' -%}
+            {%- comment -%} Social Icons {%- endcomment -%}
+            <div class="product__social-sharing" {{ block.shopify_attributes }}>
+              {%- render 'social-sharing', product: product -%}
+            </div>
+
+          {%- when 'custom_liquid' -%}
+            <div {{ block.shopify_attributes }}>
+              {{ block.settings.custom_liquid }}
+            </div>
+    
+    		{% when 'product_tabs' %}
+     {%- render 'bd-product-tabs', product: product -%}
+
+    <div class="cstm_mob cstm_prd_des_images_gallery">
+      <div class="cstm_prd_des_images_gallery_inner">
+        <div class="cstm_prd_des_images_gallery_flex">
+          {%- for media in product.media -%}
+            {%  if forloop.index != 1 %}
+              <div class="cstm_prd_des_images_gallery_flex_item" data-option-value="{{ media.alt }}">
+    			<img src="{{ media | img_url: '900x' }}" alt="Product Image" />
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    
+    		{% when 'product_icons' %}
+     {%- render 'bd-product-icons', product: product -%}
+    
+        {%- endcase -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- comment -%} Code to be shown on QuickView {%- endcomment -%}
+      <h1 class="product__title">
+        <a href="{{ product_url }}" title="{{ product_title }}">{{ product_title }}</a>
+      </h1>
+
+      <div class="product__price-and-badge">
+  {%- if block.settings.show_rating or settings.show_rating and section_type == 'quickview' -%}
+    {%- unless product == blank -%}
+      {%- render 'rating', show_rating_count: block.settings.show_rating_count, single_star: true, reviews: product.metafields.reviews -%}
+    {%- else -%}
+      {%- render 'rating', show_rating_count: block.settings.show_rating_count, single_star: true, onboarding: true -%}
+    {%- endunless -%}
+  {%- endif -%}
+
+  <p class="product__price" data-price-wrapper>
+    {%- unless product == blank -%}
+      <span data-product-price>{{ current_variant.price | money }} </span>
+    {%- else -%}
+      <span id="ProductPrice">{{ 1999 | money }}</span>
+    {%- endunless -%}
+
+    <s class="product__price__sale" data-compare-price>
+      {%- if current_variant.compare_at_price -%}
+        {{- current_variant.compare_at_price | money -}}
+      {%- endif -%}
+    </s>
+
+    {%- if current_variant.unit_price_measurement -%}
+      {%- capture unit_price_separator -%}
+        <span aria-hidden="true">/</span><span class="visually-hidden">{{ 'general.accessibility.unit_price_separator' | t }}&nbsp;</span>
+      {%- endcapture -%}
+
+      <span class="product__unit-price" data-unit-wrapper>
+        <span data-unit-price>
+          {{ current_variant.unit_price | money }}
+          {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+            {{- current_variant.unit_price_measurement.reference_value -}}
+          {%- endif -%}
+        </span>
+        {{ unit_price_separator }}
+        <span data-unit-base>{{ current_variant.unit_price_measurement.reference_unit }}</span>
+      </span>
+    {%- endif -%}
+    </p>
+</div>    
+    
+    
+ 	<div class="product__form__wrapper" data-product-form-wrapper>
+        {%- comment -%} Product Form Snippet {%- endcomment -%}
+        {%- render 'new-pdp-form', product: product, current_variant: current_variant, show_payment_button: show_payment_button, unique: unique -%}
+		  
+        {%- if settings.show_newsletter -%}
+          {%- render 'notification-form', sold_out: sold_out, product_title: product.title, product_id: product.id -%}
+        {%- endif -%}
+      </div>
+
+      <a class="product__view-button" href="{{ product.url }}">{{ 'products.general.view_all_details' | t }}</a>
+    {%- endunless -%}
+  </div>
+  <script type="application/json" id="ProductJson-{{ unique }}" data-product-json>{{ product | json }}</script>
+<script type="application/json" id="ModelJson-{{ unique }}">{{ product.media | where: 'media_type', 'model' | json }}</script>
+</div>
+
+  <div class="cstm_scroll_wrapper">
+      <div class="cstm_scroll_wrapper_inner">
+        <div class="cstm_scroll_wrapper_flex">
+          <h3>{{ product.title }}</h3>
+          <p>{{ current_variant.price | money }}</p>
+        </div>
+        <a class="cstm_scroll_wrapper_link" href="#">Select Size</a>
+      </div>
+    </div>
+
+<!-- Size Guide Popup -->
+
+<div class="cstm_popup_content_wrapper">
+  <div class="cstm_popup_content_row">    
+    <div class="cstm_popup_content_inner">
+      <h2>Size Guide</h2>
+      <a class="cstm_popup_close">&times;</a>
+      <div class="cstm_popup_table_wrapper">
+        <div class="cstm_popup_table_inner">
+          
+          <div class="tab">
+            <button id="defaultOpen" class="tablinks" onclick="openSizeTab(event, 'size-chart')">size chart</button>
+            <button class="tablinks" onclick="openSizeTab(event, 'size-measure')">How to measure</button>
+          </div>
+          
+          <div id="size-chart" class="tabcontent">
+            <p>Men’s pants</p>
+            
+            <div class="cstm_popup_table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Size</th>
+                    <th>28</th>
+                    <th>30</th>
+                    <th>32</th>
+                    <th>34</th>
+                    <th>36</th>
+                    <th>38</th>
+                    <th>40</th>
+                    <th>42</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="table_row_head">Waist</td>
+                    <td>30</td>
+                    <td>32</td>
+                    <td>34</td>
+                    <td>36</td>
+                    <td>38</td>
+                    <td>38</td>
+                    <td>42</td>
+                    <td>46</td>
+                    
+                  </tr>
+                  
+                  <tr>
+                    
+                    <td class="table_row_head">Inseam</td>
+                    <td>33</td>
+                    <td>34</td>
+                    <td>34</td>
+                    <td>34.5</td>
+                    <td>34.5</td>
+                    <td>34.5</td>
+                    <td>43.75</td>
+                    <td>44</td>
+                    
+                  </tr>
+                  
+                  <tr>
+                    
+                    <td class="table_row_head">Hip</td>
+                    <td>38</td>
+                    <td>39</td>
+                    <td>40</td>
+                    <td>41.5</td>
+                    <td>43</td>
+                    <td>44.5</td>
+                    <td>44.75</td>
+                    <td>46.5</td>
+                    
+                  </tr>
+                  
+                  <tr>
+                    
+                    <td class="table_row_head">Thigh</td>
+                    <td>20.5</td>
+                    <td>21</td>
+                    <td>22</td>
+                    <td>23</td>
+                    <td>23.5</td>
+                    <td>24.5</td>
+                    <td>25.25</td>
+                    <td>25.5</td>
+                    
+                  </tr>
+                  
+                </tbody>
+                
+                
+              </table>
+              
+            </div>
+            
+            
+            <div class="cstm_popup_size_flex">
+              
+              <div class="cstm_popup_size_flex_item cstm_popup_size_flex_item_1">
+                
+                Measure your favorite jeans and compare them to the size chart.
+                We recommend sizing down from your regular pant size.
+                
+              </div>
+              
+              <div class="cstm_popup_size_flex_item cstm_popup_size_flex_item_2">
+                
+                *all measurements in inches
+                
+              </div>
+              
+              
+            </div>
+            
+            
+          </div>
+
+          <div id="size-measure" class="tabcontent">
+            
+            
+            <div class="cstm_popup_measure_flex">
+              
+              <div class="cstm_popup_measure_flex_item">
+              
+                <h3>WAIST</h3>
+                <div class="text">
+                  
+                  Measure the distance from one side of the waistband to the other. Multiply this number by 2.
+                  
+                </div>
+                
+                <h3>INSEAM</h3>
+                <div class="text">
+                  
+                  Measure the length of the inside of the leg from the bottom up to the crotch.
+                  
+                </div>
+                
+                <h3>HIP</h3>
+                <div class="text">
+                  
+                  Measure across the widest part of the hip. Multiply this number by 2.
+                  
+                </div>
+                
+                <h3>THIGH</h3>
+                <div class="text">
+                  
+                  Measure across the pant leg 1” down from the crotch. Make sure the tape is parallel to the hem of the pant. Multiply this number by 2.
+                  
+                </div>
+                
+              </div>
+              
+              <div class="cstm_popup_measure_flex_item">
+                
+                <div class="cstm_des">
+                
+                	<img src="https://cdn.shopify.com/s/files/1/0642/4526/8695/files/Group_224.png?v=1654587529" alt="Size Chart" />
+                
+                </div>
+                
+                <div class="cstm_mob">
+                  
+                  <img src="https://cdn.shopify.com/s/files/1/0579/7347/3438/files/Group_224.png?v=1655285234" alt="Size Guide" />
+                  <img src="https://cdn.shopify.com/s/files/1/0579/7347/3438/files/Group_225.png?v=1655285234" alt="Size Guide" />
+                  
+                </div>
+                  
+              </div>
+              
+            </div>
+            
+            
+          </div>
+          
+        </div>
+        
+        
+      </div>
+      
+      <div class="cstm_popup_footer">
+        
+        Still unsure? Try using our <span>Fit Advisor</span>.
+        
+      </div>
+      
+      
+    </div>
+    
+    
+  </div>
+  
+
+</div>
+
+
+<!-- Size Guide Popup -->
+
+
+
+<!-- Risk free trial -->
+
+<div class="cstm_promotion_popup_wrapper">
+  
+  <div class="cstm_promotion_popup_inner">
+    
+    <a class="cstm_promotion_popup_close">&times;</a>
+    
+    <h3>Risk free trial</h3>
+    <p>We know the true test of any riding gear is how you feel when you ride. That’s why we’re offering a 15-day risk-free trial. If you decide they’re not up to the job, no problem—just send them back and we’ll give you a full refund, no questions asked (but we’re confident that won’t be necessary).</p>
+    
+  </div>
+  
+  
+</div>
+
+
+
+<script type="text/javascript">
+  var _learnq = _learnq || [];
+  var item = {
+    Name: {{ product.title|json }},
+    ProductID: {{ product.id|json }},
+    Categories: {{ product.collections|map:'title'|json }},
+    ImageURL: "https:{{ product.featured_image.src|img_url:'grande' }}",
+    URL: "{{ shop.secure_url }}{{ product.url }}",
+    Brand: {{ product.vendor|json }},
+    Price: {{ product.price|money|json }},
+    CompareAtPrice: {{ product.compare_at_price_max|money|json }}
+  };
+  _learnq.push(['track', 'Viewed Product', item]);
+  _learnq.push(['trackViewedItem', {
+    Title: item.Name,
+    ItemId: item.ProductID,
+    Categories: item.Categories,
+    ImageUrl: item.ImageURL,
+    Url: item.URL,
+    Metadata: {
+      Brand: item.Brand,
+      Price: item.Price,
+      CompareAtPrice: item.CompareAtPrice
+    }
+  }]);
+</script>
+
+<script type="text/javascript">
+window.onload = function() {
+var _learnq = window._learnq || [];
+document.querySelector('.btn--submit').addEventListener('click',function (){
+_learnq.push(['track', 'Added to Cart', item]);
+});
+};
+</script>

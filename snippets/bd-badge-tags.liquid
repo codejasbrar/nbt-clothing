@@ -1,0 +1,13 @@
+{% assign badgeTags = settings.badge_tags | split: ',' %}
+
+<div class="badges flex align-center {% if template.name contains 'product' %}product-version{% endif %}">
+{% for badgeTag in badgeTags %} 
+{% if product.tags contains badgeTag %}
+  
+  
+<a href="{{ product.collections[0].url }}/{{ badgeTag | handle }}" class="badge">{{ badgeTag }}</a>
+  
+  
+{% endif %}
+{% endfor %}
+</div>

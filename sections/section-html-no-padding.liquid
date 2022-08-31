@@ -1,0 +1,29 @@
+{% comment %} Settings {% endcomment %}
+
+{%- assign html = section.settings.html -%}
+
+
+<section id="Html--{{ section.id }}" class="custom-html" data-section-id="{{ section.id }}" data-section-type="custom-html">
+          {{ html }}
+</section>
+
+{% schema %}
+{
+  "name": "Custom HTML No Padding",
+  "settings": [
+
+    {
+      "type": "html",
+      "id": "html",
+      "label": "Custom HTML",
+      "default": "<p>Once you write some HTML, it will render right here.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "category": "Text",
+      "name": "Custom HTML for scripts"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,52 @@
+
+
+{% if product.metafields.description.short != blank %}
+<div class="product-tabs cc-accordion">
+
+  <details class="accordion-item product-tab">
+  <summary class="accordion-toggle product-tab__title" aria-controls="details" data-collapsible-trigger>
+   
+      <span>Details</span> 
+           {%- render 'icon-plus' -%}
+          {%- render 'icon-minus' -%}
+  </summary>
+  
+     <div class="product-tab__content" id="details" data-collapsible-container>
+          <div class="product-tab__inner rte" data-collapsible-content>
+             {{ product.description }}
+          </div>
+        </div>
+  
+ 
+</details>
+  {% endif %}
+  
+{% if product.metafields.tab.size > 0 %}
+{% for tab in product.metafields.tab %}
+{% if tab[0] contains '01' or tab[0] contains '02' or tab[0] contains '03' or tab[0] contains '04' or tab[0] contains '05' or tab[0] contains '06' or tab[0] contains '07' or tab[0] contains '08' or tab[0] contains '09' %} 
+{% assign tabName = tab[0] | slice: 2, 256 %} 
+{% else %} 
+{% assign tabName = tab[0] %}
+{% endif %}
+ 
+<details class="accordion-item product-tab">
+  <summary class="accordion-toggle product-tab__title" aria-controls="{{ tabName | handle }}" data-collapsible-trigger>
+   
+      <span>{{ tabName }}</span> 
+           {%- render 'icon-plus' -%}
+          {%- render 'icon-minus' -%}
+  </summary>
+  
+     <div class="product-tab__content" id="{{ tabName | handle }}" data-collapsible-container>
+          <div class="product-tab__inner rte" data-collapsible-content>
+             {{ tab[1] }}
+          </div>
+        </div>
+  
+ 
+</details>
+{% endfor %}
+  {% endif %}
+</div>
+
+ 

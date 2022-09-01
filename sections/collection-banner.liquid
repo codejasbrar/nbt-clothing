@@ -1,0 +1,60 @@
+<section id="collection_banner_section">
+  <div class="collection_banner_main" style="background-image: url({% if section.settings.image != blank %}{{ section.settings.image | img_url: 'master' }}{% endif %});">
+    <div class="collection_banner_content">
+    <div class="collection_banner_left big_heading">
+      <h1>{{ section.settings.heading }}</h1>
+    </div>
+    <div class="collection_banner_right content">
+      <p>{{ section.settings.content }}</p>
+    </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media only screen and (max-width: 480px){
+  .collection_banner_main{
+    background-image: url({% if section.settings.mb_image != blank %}{{ section.settings.mb_image | img_url: 'master' }}{% else %}{{ section.settings.image | img_url: 'master' }}{% endif %}) !important;
+  }
+ }
+</style>
+
+{% schema %}
+  {
+    "name": "Collection banner",
+    "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mb_image",
+      "label": "Mobile image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "heading"
+    },
+    {
+      "type": "textarea",
+      "id": "content",
+      "label": "Content"
+    }
+    ],
+  "presets": [
+    {
+      "name": "Collection banner",
+      "category": "Collection"
+    }
+  ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

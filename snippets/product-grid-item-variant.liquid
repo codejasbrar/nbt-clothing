@@ -62,7 +62,6 @@
   assign current_variant = product.selected_or_first_available_variant
   assign featured_media = product.featured_media
 -%}
-
 {% for option in product.options %}
   {% if option == "Color" or option == "Colour" %}
     {% assign index = forloop.index0 %}
@@ -144,7 +143,7 @@
         </a>
       </div>
     {%- endif -%}
-
+        
     {%- render 'product-badge', on_sale: on_sale, sold_out: sold_out, badge: badge, preorder_badge: preorder_badge -%}
 
     {%- if settings.product_grid_slideshow and section.settings.products_layout != 'carousel' and product.media.size > 1 -%}
@@ -224,6 +223,10 @@
       {%- endif -%}
     {%- endif -%}
 
+        <div class="product_image_logo">
+          <img src="https://cdn.shopify.com/s/files/1/0579/7347/3438/files/Group_234.svg?v=1662031452">
+        </div>
+        
     {%- unless settings.quick_button == 'none' -%}
       <div class="btn-wrapper">
         {%- if settings.quick_button == 'view' -%}
@@ -250,10 +253,11 @@
   </div>
 
   {% comment %} Product info {% endcomment %}
+  <div class="product-grid-item__info-main">
   <div class="product-grid-item__info">
     {% comment %} Title {% endcomment %}
     <a class="product-grid-item__title" href="{{ variant.url  }}" aria-label="{{ product.title | strip_html | escape }}" title="{{ product.title | strip_html | escape }}">
-      {{- product.title | strip_html | escape -}} &nbsp - {{color}}
+      {{- product.title | strip_html | escape -}}&nbsp in <span>{{color}}</span>
     </a>
 {% render 'judgeme_widgets', widget_type: 'judgeme_preview_badge', jm_style: '', concierge_install: true, product: product %}
     {% comment %} Price {% endcomment %}
@@ -297,7 +301,7 @@
       {% endfor %}
 
       
-    <span class="cstm_total_variants" style="display: none;">{% if cstmIndex == 1 %}{{ cstmIndex }} color{% else if cstmIndex > 1 %}{{ cstmIndex }} colors{% endif %}</span>
+    <span class="cstm_total_variants">{% if cstmIndex == 1 %}{{ cstmIndex }} color{% else if cstmIndex > 1 %}{{ cstmIndex }} colors{% endif %}</span>
 
       </div>
 
@@ -344,6 +348,10 @@
 {%- endunless -%}
     {%- endif -%}
   </div>
+    <div class="prodict_grid_info_icons">
+      <img src="https://cdn.shopify.com/s/files/1/0579/7347/3438/files/icons.svg?v=1662034471">
+    </div>
+  </div>
 </div>
        {% capture tempList %}
           {{colorlist | append: color | append: ' '}}
@@ -353,3 +361,17 @@
     {% endfor %}
   {% endif %}
 {% endfor %}
+{% if collection.title == 'Pants' %}
+<div class="product-grid-item{% if carousel %} carousel__item{% endif %} {{ size_desktop }} {{ size_mobile }}{% if tag %} has-tag{% endif %} last_grid"
+  {% if carousel %}
+    data-product-slide
+  {% endif %}
+  data-product-id="{{ product.id }}"
+>
+  <div class="product_last_grid_inner">
+    <h1>{{ collection.metafields.custom.last_grid_heading }}</h1>
+    <p>{{ collection.metafields.custom.last_grid_content }}</p>
+    <a href="{{ collection.metafields.custom.last_grid_button_url }}" class="slide__btn btn btn--primary">{{ collection.metafields.custom.last_grid_button_text }}</a>
+  </div>
+</div>
+{% endif %}

@@ -3798,17 +3798,19 @@ PaloAlto.Filters = (function() {
       });
 
       // Open filters and scroll lock if only they are hidden on lower sized screens
-      if (windowWidth < 1320) {
+   //   if (windowWidth < 1320) {
         this.filters.classList.add(classes.filtersVisible);
 
-        if (pageScrollLockTimeout) {
+     /*   if (pageScrollLockTimeout) {
           clearTimeout(pageScrollLockTimeout);
         }
         scrollLock.disablePageScroll(scrollableElement);
-      }
+        */
+   //   }
 
       // Scroll filters into view
-      if (this.filtersStickyBar) {
+  
+     /*    if (this.filtersStickyBar) {
         let stickyBarOffsetTop = this.getStickyBarOffsetTop();
 
         window.scrollTo({
@@ -3817,6 +3819,7 @@ PaloAlto.Filters = (function() {
           behavior: 'smooth',
         });
       }
+      */
     },
 
     /*

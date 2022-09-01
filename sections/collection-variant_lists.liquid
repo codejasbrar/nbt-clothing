@@ -70,9 +70,12 @@
     <div class="wrapper wrapper--full">
       <div class="collection__inner">
         
-   
+    
 		
-        
+
+        {%- if show_breadcrumbs or enable_filters or enable_sorting or enable_filters -%}  
+          <div class="filters_block">
+          {%- endif  -%}
 
         {%- if show_breadcrumbs or enable_filters or enable_sorting -%}
           <div class="collection__sticky-bar" id="CollectionStickyBar" data-collection-sticky-bar>
@@ -461,6 +464,10 @@
     </div>
   </div>
 {%- endif -%}
+            
+        {%- if show_breadcrumbs or enable_filters or enable_sorting or enable_filters -%}  
+          </div>
+          {%- endif  -%}
           {%- endif -%}
         {%- endif -%}
 
@@ -519,15 +526,14 @@
           </div>
 
         {%- endpaginate -%}
-
+{% comment %}
              {% include 'dp-collection-hero' %}
-        
         {% if collection.metafields.global.additional_text != blank %}
         <div class="additional_text">
           {{ collection.metafields.global.additional_text }}
         </div>
-        {% endif %}
-        
+        {% endif %}  
+{% endcomment %}
       </div>
     </div>
   </div>
